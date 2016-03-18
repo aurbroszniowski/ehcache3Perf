@@ -8,6 +8,10 @@
   <artifactId>ehcache3Perf</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <properties>
+    <reportDir>${basedir}/target/rainfall/${test}-${nbThreads}</reportDir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>net.sf.ehcache</groupId>
@@ -48,6 +52,8 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+
+      <!-- mvn compile exec:exec -Dtest=readonly.onheap.Ehcache3 -DnbThreads=1 -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -61,7 +67,12 @@
             <argument>-XX:MaxDirectMemorySize=8g</argument>
             <argument>-XX:+UnlockCommercialFeatures</argument>
             <argument>-XX:+FlightRecorder</argument>
-            <argument>readonly.onheap.Ehcache3</argument>
+            <argument>-XX:FlightRecorderOptions=defaultrecording=true</argument>
+            <argument>-XX:FlightRecorderOptions=defaultrecording=true,settings=src/main/resources/performance.jfc,dumponexit=true,dumponexitpath=${reportDir}/perftest.jfr</argument>
+            <argument>-DnbThreads=${nbThreads}</argument>
+            <argument>-DreportDir=${reportDir}</argument>
+            <argument>${test}</argument>
+            <!--<argument>readonly.onheap.Ehcache3</argument>-->
           </arguments>
         </configuration>
       </plugin>

@@ -39,6 +39,7 @@ import static io.rainfall.execution.Executions.times;
 
 /**
  * analyze churn with $JAVA_HOME/bin/jmc
+ *
  * @author Ludovic Orban
  */
 public class Ehcache3 {
@@ -63,7 +64,6 @@ public class Ehcache3 {
     cacheConfig.cache("cache1", cache1);
 
     final int nbElementsPerThread = 100000;
-    final File reportPath = new File("target/rainfall/" + Ehcache3.class.getName().replace('.', '/'));
     Runner.setUp(
         Scenario.scenario("Loading phase")
             .exec(
@@ -79,17 +79,20 @@ public class Ehcache3 {
 
     System.out.println("testing...");
 
+    int nbThreads = Integer.parseInt(System.getProperty("nbThreads", "1"));
+    final File reportPath = new File(System.getProperty("reportDir"));
+
     Runner.setUp(
         Scenario.scenario("Testing phase")
             .exec(
                 Ehcache3Operations.get(Long.class, String.class).using(keyGenerator, valueGenerator)
-                    .atRandom(Distribution.GAUSSIAN, 0, nbElementsPerThread, nbElementsPerThread/10)
+                    .atRandom(Distribution.GAUSSIAN, 0, nbElementsPerThread, nbElementsPerThread / 10)
             ))
         .executed(during(120, TimeDivision.seconds))
         .config(
-            ConcurrencyConfig.concurrencyConfig().threads(Runtime.getRuntime().availableProcessors()),
-            report(EhcacheResult.class, new EhcacheResult[] {EhcacheResult.GET, EhcacheResult.MISS}).log(html(reportPath.getPath())),
-            cacheConfig)
+            ConcurrencyConfig.concurrencyConfig().threads(nbThreads),
+            report(EhcacheResult.class, new EhcacheResult[] { EhcacheResult.GET, EhcacheResult.MISS })
+                .log(html(reportPath.getPath())), cacheConfig)
         .start();
 
     cacheManager.close();
