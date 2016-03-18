@@ -22,7 +22,6 @@ import io.rainfall.configuration.ConcurrencyConfig;
 import io.rainfall.ehcache.statistics.EhcacheResult;
 import io.rainfall.ehcache3.CacheConfig;
 import io.rainfall.ehcache3.Ehcache3Operations;
-import io.rainfall.ehcache3.operation.TpsSpikeGetOperation;
 import io.rainfall.generator.LongGenerator;
 import io.rainfall.generator.StringGenerator;
 import io.rainfall.generator.sequence.Distribution;
@@ -47,7 +46,7 @@ import static io.rainfall.execution.Executions.times;
  *
  * @author Ludovic Orban
  */
-public class Ehcache3 {
+public class Ehcache3Limit {
 
   public static void main(String[] args) throws Exception {
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
@@ -107,8 +106,7 @@ public class Ehcache3 {
     return Runner.setUp(
         Scenario.scenario("Testing phase")
             .exec(
-                new TpsSpikeGetOperation<Long, String >(4_000_000)
-                .using(keyGenerator, valueGenerator)
+                Ehcache3Operations.get(Long.class, String.class).using(keyGenerator, valueGenerator)
                     .atRandom(Distribution.GAUSSIAN, 0, nbElementsPerThread, nbElementsPerThread / 10)
             ))
         .executed(during(180, TimeDivision.seconds))

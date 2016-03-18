@@ -210,7 +210,7 @@
 
     <event path="vm/runtime/thread_dump">
       <setting name="enabled" control="thread-dump-enabled">true</setting>
-      <setting name="period" control="thread-dump-interval">everyChunk</setting>
+       <setting name="period" control="thread-dump-interval">60 s</setting>
     </event>
 
     <event path="vm/flag/long">
